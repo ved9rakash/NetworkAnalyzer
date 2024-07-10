@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 
-project("learntools" VERSION 1.0 LANGUAGES CXX)
+project("network_analyzer" VERSION 1.0 LANGUAGES CXX)
 
 #Set CXX standard
 set(CMAKE_CXX_STANDARD 20)
@@ -20,8 +20,8 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(googletest)
 
 #Include directories
-include_directories(${PROJECT_SOURCE_DIR}/include/learntools/)
+include_directories(${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/)
 
 #Include sub-directories 
 add_subdirectory("src")
-add_subdirectory("test")
+add_subdirectory("tests")
