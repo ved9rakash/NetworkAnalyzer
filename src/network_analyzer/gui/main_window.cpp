@@ -8,6 +8,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 }
 
+void MainWindow::addPacketInfo(const QString& info) {
+    ui->textEdit->append(info);
+}
+
 MainWindow::~MainWindow() {
     delete ui;
 }
