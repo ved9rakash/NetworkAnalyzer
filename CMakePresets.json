@@ -11,7 +11,7 @@
       "description": "Debug build with g++",
       "displayName": "Debug",
       "binaryDir": "${sourceDir}/cmake/build-debug/",
-      "generator": "Unix Makefiles",
+      "generator": "Ninja",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_CXX_COMPILER": "/usr/bin/g++",
@@ -24,7 +24,8 @@
       "description": "Release build with g++",
       "inherits": "default",
       "displayName": "Release",
-      "generator": "Unix Makefiles",
+      "binaryDir": "${sourceDir}/cmake/build-release/",
+      "generator": "Ninja",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
         "CMAKE_CXX_COMPILER": "/usr/bin/g++",
