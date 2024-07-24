@@ -1,6 +1,5 @@
 #pragma once
 
-#include "pcapplusplus/Packet.h"
 #include "pcapplusplus/PcapLiveDevice.h"
 
 class PacketHandler {
