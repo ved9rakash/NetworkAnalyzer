@@ -2,6 +2,7 @@
 
 # Exit immediately if a command exits with a non-zero status.
 set -e
+#testing
 
 rm -rf cmake
 cmake --preset default --log-level=VERBOSE
