@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>MainWindow</class>
-  <widget class="QMainWindow" name="MainWindow">
+ <widget class="QMainWindow" name="MainWindow">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -13,18 +13,30 @@
   <property name="windowTitle">
    <string>Network Analyzer</string>
   </property>
-  <widget class="QWidget" name="centralWidget"/>
-    <widget class="QTextEdit" name="textEdit">
-      <property name="geometry">
-      <rect>
-        <x>10</x>
-        <y>10</y>
-        <width>780</width>
-        <height>580</height>
-      </rect>
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QComboBox" name="interfaceComboBox"/>
+    </item>
+    <item>
+     <widget class="QPushButton" name="startButton">
+      <property name="text">
+       <string>Start Capture</string>
       </property>
-    </widget>
+     </widget>
+    </item>
+    <item>
+     <widget class="QTextEdit" name="textEdit"/>
+    </item>
+    <item>
+     <widget class="QtCharts::QChartView" name="chartView"/>
+    </item>
+    <item>
+     <widget class="QLabel" name="statusLabel"/>
+    </item>
+   </layout>
   </widget>
+ </widget>
  <resources/>
  <connections/>
 </ui>
