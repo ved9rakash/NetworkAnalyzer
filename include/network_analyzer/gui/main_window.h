@@ -3,7 +3,7 @@
 #include "analysis_engine.h"
 
 #include <QMainWindow>
-#include <QMainWindow>
+
 #include <QtCharts/QChart>
 #include <QtCharts/QChartView>
 #include <QtCharts/QLineSeries>
