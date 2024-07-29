@@ -26,7 +26,7 @@ public:
     void stop();
 
 signals:
-    void packetCaptured(const QString& info);
+    void packetCaptured(const QString& info, int bytes, bool isOutGoing);
 
 private:
     std::string interface;

@@ -1,7 +1,13 @@
 #include "analysis_engine.h"
 
+#include <pcapplusplus/IPv4Layer.h>
+#include <pcapplusplus/TcpLayer.h>
+#include <pcapplusplus/UdpLayer.h>
+#include <pcapplusplus/IcmpLayer.h>
+
 #include <pcapplusplus/RawPacket.h>
 #include <QMetaObject>
+#include <QDateTime>
 #include "pcapplusplus/PcapLiveDeviceList.h"
 #include <pcapplusplus/PcapLiveDevice.h>
 
@@ -25,8 +31,8 @@ std::vector<std::string> NetworkAnalyzer::listInterfaces() {
 
 // Setting the required interface which is passed to 
 // the function and handling exception.
-void NetworkAnalyzer::setInterface(const std::string& interface) {
-    this->interface = interface;
+void NetworkAnalyzer::setInterface(const std::string& interfaces) {
+    this->interface = interfaces;
     dev = pcpp::PcapLiveDeviceList::getInstance().getPcapLiveDeviceByName(interface);
     if (dev == nullptr) {
         throw std::runtime_error("Could not find the network interface");
@@ -41,7 +47,9 @@ void NetworkAnalyzer::start() {
     if (!dev->open()) {
         throw std::runtime_error("Could not open device: " + interface);
     }
+    dev->setFilter("ip"); // You can set filters as needed
     dev->startCapture(packetCallback, this);
+    // dev->startCapture(packetCallback, this);
 }
 
 // Stoping the packet capture.
@@ -55,6 +63,42 @@ void NetworkAnalyzer::stop() {
 // Callback function for packet capture
 void NetworkAnalyzer::packetCallback(pcpp::RawPacket* packet, pcpp::PcapLiveDevice* dev, void* cookie) {
     NetworkAnalyzer* analyzer = static_cast<NetworkAnalyzer*>(cookie);
-    QString info = QString("Packet captured: %1 bytes").arg(packet->getRawDataLen());
-    QMetaObject::invokeMethod(analyzer, "packetCaptured", Qt::QueuedConnection, Q_ARG(QString, info));
+    pcpp::Packet parsedPacket(packet);
+
+    QString srcIp, dstIp, protocol;
+    bool isOutgoing = false;
+    int packetLength = packet->getRawDataLen();
+
+    if (parsedPacket.isPacketOfType(pcpp::IPv4)) {
+        pcpp::IPv4Layer* ipLayer = parsedPacket.getLayerOfType<pcpp::IPv4Layer>();
+        srcIp = QString::fromStdString(ipLayer->getSrcIPAddress().toString());
+        dstIp = QString::fromStdString(ipLayer->getDstIPAddress().toString());
+
+        if (parsedPacket.isPacketOfType(pcpp::TCP)) {
+            protocol = "TCP";
+        } else if (parsedPacket.isPacketOfType(pcpp::TCP)) {
+            protocol = "TCP";
+        } else if (parsedPacket.isPacketOfType(pcpp::UDP)) {
+            protocol = "UDP";
+        } else if (parsedPacket.isPacketOfType(pcpp::ICMP)) {
+            protocol = "ICMP";
+        } else {
+            protocol = "Other";
+        }
+
+        // Determine if the packet is outgoing
+        if (ipLayer->getSrcIPAddress().toString() == dev->getIPv4Address().toString()) {
+            isOutgoing = true;
+        } 
+
+        QString timestamp = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
+        QString info = QString("%1, %2, %3, %4, %5 bytes")
+            .arg(timestamp)
+            .arg(srcIp)
+            .arg(dstIp)
+            .arg(protocol)
+            .arg(packetLength);
+
+        QMetaObject::invokeMethod(analyzer, "packetCaptured", Qt::QueuedConnection, Q_ARG(QString, info), Q_ARG(int, packetLength), Q_ARG(bool, isOutgoing));
+    }
 }

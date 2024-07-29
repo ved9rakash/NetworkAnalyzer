@@ -14,13 +14,20 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow),
     analyzer(new NetworkAnalyzer(this)),
     chart(new QtCharts::QChart()),
-    series(new QtCharts::QLineSeries()),
+    incomingSeries(new QtCharts::QLineSeries()),
+    outgoingSeries(new QtCharts::QLineSeries()),
     timeCounter(0) {
 
     ui->setupUi(this);
 
     // Setup charts
-    chart->addSeries(series);
+    incomingSeries->setName("Incoming");
+    incomingSeries->setColor(Qt::blue);
+    outgoingSeries->setName("Outgoing");
+    outgoingSeries->setColor(Qt::red);
+
+    chart->addSeries(incomingSeries);
+    chart->addSeries(outgoingSeries);
     chart->createDefaultAxes();
     ui->chartView->setChart(chart);
 
@@ -33,19 +40,13 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->interfaceComboBox->addItems(interfaces);
 
     connect(ui->startButton, &QPushButton::clicked, this, &MainWindow::startCapture);
+    connect(ui->stopButton, &QPushButton::clicked, this, &MainWindow::stopCapture);
     connect(analyzer, &NetworkAnalyzer::packetCaptured, this, &MainWindow::addPacketInfo);
 }
 
-void MainWindow::addPacketInfo(const QString& info) {
+void MainWindow::addPacketInfo(const QString& info, int bytes, bool isOutgoing) {
     ui->textEdit->append(info);
-    QStringList parts = info.split(" ");
-    if (parts.size() >= 3) {
-        bool ok;
-        int bytes = parts[2].toInt(&ok);
-        if (ok) {
-            updateGraph(bytes);
-        }
-    }
+    updateGraph(bytes, isOutgoing);
 }
 
 void MainWindow::startCapture() {
@@ -55,12 +56,23 @@ void MainWindow::startCapture() {
         analyzer->start();
         ui->statusLabel->setText("Capturing on: " + selectedInterface);
     } catch (const std::exception& e) {
-        QMessageBox::critical(this, "Error", e.what());
+                QMessageBox::critical(this, "Error", e.what());
     }
 }
 
-void MainWindow::updateGraph(int bytes) {
-    series->append(timeCounter++, bytes);
+void MainWindow::stopCapture() {
+    analyzer->stop();
+    ui->statusLabel->setText("Status: Not Capturing");
+}
+
+void MainWindow::updateGraph(int bytes, bool isOutgoing) {
+    if (isOutgoing) {
+        outgoingSeries->append(timeCounter, bytes);
+    } else {
+        incomingSeries->append(timeCounter, bytes);
+    }
+    timeCounter++;
+
     chart->axisX()->setRange(0, timeCounter);
     auto yAxis = qobject_cast<QtCharts::QValueAxis*>(chart->axisY());
     if (yAxis) {

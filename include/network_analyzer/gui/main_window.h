@@ -20,15 +20,17 @@ public:
     ~MainWindow();
 
 public slots:
-    void addPacketInfo(const QString& info);
+    void addPacketInfo(const QString& info, int bytes, bool isOutGoing);
     void startCapture();
-    void updateGraph(int bytes);
+    void stopCapture();
+    void updateGraph(int bytes, bool isOutGoing);
 
 private:
     Ui::MainWindow *ui;
     NetworkAnalyzer *analyzer;
     QtCharts::QChart *chart;
-    QtCharts::QLineSeries *series;
-    
+    // QtCharts::QLineSeries *series;
+    QtCharts::QLineSeries *incomingSeries;
+    QtCharts::QLineSeries *outgoingSeries;
     int timeCounter;
 };
