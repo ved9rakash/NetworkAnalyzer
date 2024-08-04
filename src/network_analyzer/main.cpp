@@ -3,6 +3,7 @@
 #include <QApplication>
 
 int main(int argc, char *argv[]) {
+    //Start the QT Window
     QApplication app(argc, argv);
 
     MainWindow mainWindow;
